@@ -4,11 +4,17 @@ param(
     [string]$Branch = 'main',
     [string]$Owner  = 'brunohenriquegardanimonteiro-crypto',
     [string]$Repo   = 'rockhero-teste2',
+    [switch]$Force,
     [string]$Entry  = '',
     [switch]$SelfTest,
+    [switch]$ListSongs,
+    [switch]$Benchmark,
+    [switch]$AudioDiag,
     [switch]$NoAudio,
+    [switch]$Ascii,
     [switch]$Console,
-    [switch]$Force
+    [int]$Volume,
+    [double]$SpeedScale
 )
 
 $ErrorActionPreference = 'Stop'
@@ -43,11 +49,18 @@ if ($Force -or -not $Launcher) {
 
 if (-not $Launcher) { throw "rockhero.ps1 nao encontrado em $RepoDir" }
 
+# repassa apenas o que o rockhero.ps1 realmente aceita
+$accepted = @((Get-Command -Name $Launcher).Parameters.Keys)
+$own = @('Branch', 'Owner', 'Repo', 'Force')
 $splat = @{}
-if ($Entry)    { $splat['Entry']    = $Entry }
-if ($SelfTest) { $splat['SelfTest'] = $true }
-if ($NoAudio)  { $splat['NoAudio']  = $true }
-if ($Console)  { $splat['Console']  = $true }
+foreach ($k in $PSBoundParameters.Keys) {
+    if ($own -contains $k) { continue }
+    if ($accepted -contains $k) {
+        $splat[$k] = $PSBoundParameters[$k]
+    } else {
+        Write-Warning "parametro -$k nao existe no rockhero.ps1 e foi ignorado"
+    }
+}
 
 & $Launcher @splat
 if ($LASTEXITCODE) { Write-Host "rockhero terminou com codigo $LASTEXITCODE" }
