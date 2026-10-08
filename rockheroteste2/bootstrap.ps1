@@ -50,4 +50,4 @@ if ($NoAudio)  { $splat['NoAudio']  = $true }
 if ($Console)  { $splat['Console']  = $true }
 
 & $Launcher @splat
-if ($LASTEXITCODE) { exit $LASTEXITCODE }
+if ($LASTEXITCODE) { Write-Host "rockhero terminou com codigo $LASTEXITCODE" }
